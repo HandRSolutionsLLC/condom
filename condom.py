@@ -1,13 +1,18 @@
 from subprocess import getoutput as cmd
 from os import system as cmd_
 from time import sleep
+import platform as pl
 import threading
+
+
 
 # NOTICE OF FALSE POSITIVE
 # External Hard Disks are also recognised as Local Fixed Disk.
 # I suggest the software logs the serial numbers of the current disks(if more than one) and
 # their total number. If the number of disks detected exceed the total number we automatically
 # know it's foreign even if it is an external HDD and it reads as "Local Fixed Disk"   
+
+
 
 class Timer(threading.Thread):
 	def __init__(_,time):
@@ -24,13 +29,21 @@ class Timer(threading.Thread):
 
 class CMD:
 	def __init__(_):
-		_.getID = "wmic diskdrive get pnpdeviceid" 
+		_.getID = "wmic diskdrive get pnpdeviceid"
+	 
+
+
+def DeviceIsCompatible():
+	'''This ensures the OS is Windows 10 or Linux'''
+	return True if (pl.system() == "Windows" and pl.release() == "10") or pl.system() == "Linux" else False 
+
 
 def driveDetected():
 	#The first output is a header so we skip it
 	#If more than one drive is detected it returns true
-	numOfDrives=len(cmd(shell.getID).split()[1:])
-	return numOfDrives > 1
+	if pl.system() == "Windows": numOfDrives=len(cmd(shell.getID).split()[1:])
+	elif pl.system() == "Linux": numOfDrives=len([item for item in check_output('lsblk --scsi', shell=True).decode("utf-8").split() if item.startswith('s') and len(item)==3])
+	return numOfDrives > 1 
 
 def ejectForeignDrive():
 	print('Ejecting......')
@@ -38,7 +51,14 @@ def ejectForeignDrive():
 	print('Ejecting Complete!')
 
 
+
+
+
+if not DeviceIsCompatible(): print("Sorry! Your device is not compatible with this software.\nYou need a Windows 10 or Linux machine, Thank You."),exit()
+
 shell = CMD()
+
+
 while True:
 	sleep(1)
 	if driveDetected():
