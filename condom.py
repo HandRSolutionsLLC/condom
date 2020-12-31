@@ -42,7 +42,7 @@ def driveDetected():
 	#The first output is a header so we skip it
 	#If more than one drive is detected it returns true
 	if pl.system() == "Windows": numOfDrives=len(cmd(shell.getID).split()[1:])
-	elif pl.system() == "Linux": numOfDrives=len(cmd('lsblk -S').split('\n')[1:])
+	elif pl.system() == "Linux": numOfDrives=len(cmd('lsblk -S | grep disk').split('\n'))
 	return numOfDrives > 1 
 
 def ejectForeignDrive():
